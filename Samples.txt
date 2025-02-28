@@ -1,28 +1,22 @@
-/* Remove Kendo's blue highlight (outline & focus styles) */
+/* Remove focus blue highlight */
+.k-autocomplete .k-input:focus,
+.k-autocomplete.k-focus {
+    box-shadow: none !important;
+    border-color: transparent !important;
+    outline: none !important;
+}
+
+/* Ensure the input blends naturally */
+.k-autocomplete .k-input {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+
+/* Optional: If the span wrapper is causing issues */
 .k-autocomplete {
     border: none !important;
     box-shadow: none !important;
     background: transparent !important;
 }
-
-/* Remove the inner highlight */
-.k-autocomplete.k-focus {
-    box-shadow: none !important;
-    border-color: transparent !important;
-}
-
-/* Make sure the input inside the autocomplete looks natural */
-.k-autocomplete .k-input {
-    border: none !important;
-    box-shadow: none !important;
-}
-
-
-
-
-.k-autocomplete .k-input {
-    background-color: transparent !important;
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-} 
