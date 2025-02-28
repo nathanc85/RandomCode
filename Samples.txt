@@ -20,3 +20,12 @@
     box-shadow: none !important;
     background: transparent !important;
 }
+
+
+/* Remove Bootstrap focus outline & blue glow */
+.input-group .form-control:focus,
+.input-group .form-control:focus-visible {
+    box-shadow: none !important;
+    border-color: transparent !important;
+    outline: none !important;
+}
