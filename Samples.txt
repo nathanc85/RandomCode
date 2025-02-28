@@ -24,3 +24,15 @@
     border-color: transparent !important;
     outline: none !important;
 }
+
+
+change: function() {
+        var value = this.value();
+        var dataItem = this.dataSource.data().find(item => 
+            (item.FirstName + " " + item.LastName) === value
+        );
+
+        if (!dataItem) {
+            this.value(""); // Clear input if no valid selection
+        }
+    }
