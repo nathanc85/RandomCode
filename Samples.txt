@@ -1,30 +1,25 @@
-/* Remove focus blue highlight */
-.k-autocomplete .k-input:focus,
-.k-autocomplete.k-focus {
+/* Remove Bootstrap and Kendo focus styles from the input */
+.input-group .form-control:focus,
+.input-group .form-control:focus-visible,
+.k-autocomplete.k-focus,
+.k-autocomplete .k-input:focus {
     box-shadow: none !important;
     border-color: transparent !important;
     outline: none !important;
 }
 
-/* Ensure the input blends naturally */
-.k-autocomplete .k-input {
+/* Remove Bootstrap focus glow from the outer span */
+.input-group:focus-within,
+.input-group span:focus-within,
+.input-group > .k-autocomplete.k-focus {
+    box-shadow: none !important;
+    border-color: transparent !important;
     outline: none !important;
-    border: none !important;
-    box-shadow: none !important;
-    background-color: transparent !important;
 }
 
-/* Optional: If the span wrapper is causing issues */
-.k-autocomplete {
-    border: none !important;
-    box-shadow: none !important;
-    background: transparent !important;
-}
-
-
-/* Remove Bootstrap focus outline & blue glow */
-.input-group .form-control:focus,
-.input-group .form-control:focus-visible {
+/* Remove any extra focus effect from Kendo’s wrapper */
+.k-autocomplete:focus-within,
+.k-autocomplete.k-focus {
     box-shadow: none !important;
     border-color: transparent !important;
     outline: none !important;
