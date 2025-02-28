@@ -16,3 +16,13 @@
     border: none !important;
     box-shadow: none !important;
 }
+
+
+
+
+.k-autocomplete .k-input {
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+} 
