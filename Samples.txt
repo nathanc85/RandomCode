@@ -36,3 +36,43 @@ change: function() {
             this.value(""); // Clear input if no valid selection
         }
     }
+	
+
+
+<div>
+    <h3>Rate this item:</h3>
+    <input id="rating" />
+</div>
+
+<script>
+    var userId = "user123"; // Replace with actual user identifier
+
+    // Initialize Kendo Rating
+    $("#rating").kendoRating({
+        min: 1,
+        max: 5,
+        label: false,
+        select: function (e) {
+            var selectedValue = e.value;
+            saveRating(selectedValue);
+        }
+    });
+
+    // Fetch Existing Rating
+    $.get(`/api/ratings/${userId}`, function (data) {
+        $("#rating").data("kendoRating").value(data);
+    });
+
+    // Function to Save Rating
+    function saveRating(value) {
+        $.ajax({
+            url: "/api/ratings",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ userId: userId, value: value }),
+            success: function () {
+                alert("Rating saved successfully!");
+            }
+        });
+    }
+</script>
