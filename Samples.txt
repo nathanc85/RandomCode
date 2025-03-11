@@ -1,78 +1,63 @@
-/* Remove Bootstrap and Kendo focus styles from the input */
-.input-group .form-control:focus,
-.input-group .form-control:focus-visible,
-.k-autocomplete.k-focus,
-.k-autocomplete .k-input:focus {
-    box-shadow: none !important;
-    border-color: transparent !important;
-    outline: none !important;
-}
+@* -------------------------------------------------------------------------------------------------------------- *@
 
-/* Remove Bootstrap focus glow from the outer span */
-.input-group:focus-within,
-.input-group span:focus-within,
-.input-group > .k-autocomplete.k-focus {
-    box-shadow: none !important;
-    border-color: transparent !important;
-    outline: none !important;
-}
+<span>Modal</span> <br />
 
-/* Remove any extra focus effect from Kendo’s wrapper */
-.k-autocomplete:focus-within,
-.k-autocomplete.k-focus {
-    box-shadow: none !important;
-    border-color: transparent !important;
-    outline: none !important;
-}
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+    Launch static backdrop modal
+</button>
 
-
-change: function() {
-        var value = this.value();
-        var dataItem = this.dataSource.data().find(item => 
-            (item.FirstName + " " + item.LastName) === value
-        );
-
-        if (!dataItem) {
-            this.value(""); // Clear input if no valid selection
-        }
-    }
-	
-
-
-<div>
-    <h3>Rate this item:</h3>
-    <input id="rating" />
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5 w-100 text-center text-danger" id="staticBackdropLabel">Regulation Summarization Feedback</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">Please rate each criterion on a scale of 1 to 5: <b>1 - strongly disagree, 5 - strongly agree</b>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Criteria</th>
+                                <th>Description</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Accuracy</td>
+                                <td>Information is correct, with no hallucinations or misinterpretations</td>
+                                <td><input type="number" class="form-control" value="4" min="1" max="5"></td>
+                            </tr>
+                            <tr>
+                                <td>Completeness</td>
+                                <td>Are all critical aspects included without ommiting key details?</td>
+                                <td><input type="number" class="form-control" value="4" min="1" max="5"></td>
+                            </tr>
+                            <tr>
+                                <td>Comments</td>
+                                <td colspan="2">
+                                    <textarea id="comments" class="form-control" rows="4" placeholder="Add your comments here..." style="width: 100%;"></textarea>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-grid">
+                    <button type="button" class="btn btn-danger btn-lg">Submit Feedback</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Understood</button>
+            </div>
+        </div>
+    </div>
 </div>
 
-<script>
-    var userId = "user123"; // Replace with actual user identifier
-
-    // Initialize Kendo Rating
-    $("#rating").kendoRating({
-        min: 1,
-        max: 5,
-        label: false,
-        select: function (e) {
-            var selectedValue = e.value;
-            saveRating(selectedValue);
-        }
-    });
-
-    // Fetch Existing Rating
-    $.get(`/api/ratings/${userId}`, function (data) {
-        $("#rating").data("kendoRating").value(data);
-    });
-
-    // Function to Save Rating
-    function saveRating(value) {
-        $.ajax({
-            url: "/api/ratings",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({ userId: userId, value: value }),
-            success: function () {
-                alert("Rating saved successfully!");
-            }
-        });
-    }
-</script>
+<br />
+@* -------------------------------------------------------------------------------------------------------------- *@
