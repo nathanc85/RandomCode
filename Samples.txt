@@ -1,63 +1,132 @@
-@* -------------------------------------------------------------------------------------------------------------- *@
+Step 1: Modify the View (Index.cshtml)
+We will dynamically populate the dropdown with data from an API using AJAX.
 
-<span>Modal</span> <br />
+html
+Copy
+<form>
+    <label>Select an Option:</label>
+    <select id="appSettingsDropdown" class="form-select">
+        <option value="">-- Select --</option>
+    </select>
 
-<!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-    Launch static backdrop modal
-</button>
+    <label>Selected Value:</label>
+    <input type="text" id="appSettingValue" class="form-control" readonly>
+</form>
 
-<!-- Modal -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5 w-100 text-center text-danger" id="staticBackdropLabel">Regulation Summarization Feedback</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">Please rate each criterion on a scale of 1 to 5: <b>1 - strongly disagree, 5 - strongly agree</b>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Criteria</th>
-                                <th>Description</th>
-                                <th>Score</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Accuracy</td>
-                                <td>Information is correct, with no hallucinations or misinterpretations</td>
-                                <td><input type="number" class="form-control" value="4" min="1" max="5"></td>
-                            </tr>
-                            <tr>
-                                <td>Completeness</td>
-                                <td>Are all critical aspects included without ommiting key details?</td>
-                                <td><input type="number" class="form-control" value="4" min="1" max="5"></td>
-                            </tr>
-                            <tr>
-                                <td>Comments</td>
-                                <td colspan="2">
-                                    <textarea id="comments" class="form-control" rows="4" placeholder="Add your comments here..." style="width: 100%;"></textarea>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="d-grid">
-                    <button type="button" class="btn btn-danger btn-lg">Submit Feedback</button>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Understood</button>
-            </div>
-        </div>
-    </div>
-</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Load dropdown options from API
+        $.ajax({
+            url: '/Settings/GetAppSettingsOptions',
+            type: 'GET',
+            success: function (data) {
+                var dropdown = $('#appSettingsDropdown');
+                dropdown.empty().append('<option value="">-- Select --</option>');
 
-<br />
-@* -------------------------------------------------------------------------------------------------------------- *@
+                $.each(data, function (index, item) {
+                    dropdown.append($('<option>', {
+                        value: item.value,  // Store Name as Value
+                        text: item.text     // Display Name
+                    }));
+                });
+            }
+        });
+
+        // Handle dropdown change
+        $('#appSettingsDropdown').change(function () {
+            var selectedAppSettingKey = $(this).val();
+
+            if (selectedAppSettingKey) {
+                $.ajax({
+                    url: '/Settings/GetAppSettingValue',
+                    type: 'GET',
+                    data: { appSettingKey: selectedAppSettingKey },
+                    success: function (data) {
+                        $('#appSettingValue').val(data);
+                    }
+                });
+            } else {
+                $('#appSettingValue').val('');
+            }
+        });
+    });
+</script>
+Step 2: Modify the Controller (SettingsController.cs)
+We now add two API endpoints:
+
+One to get the dropdown options.
+
+Another to get the AppSetting value when an option is selected.
+
+csharp
+Copy
+[HttpGet]
+public async Task<IActionResult> GetAppSettingsOptions()
+{
+    var options = await _appSettingsService.GetDropdownOptionsAsync("DocumentType");
+    return Json(options);
+}
+
+[HttpGet]
+public async Task<IActionResult> GetAppSettingValue(string appSettingKey)
+{
+    var value = await _appSettingsService.GetAppSettingValueAsync(appSettingKey);
+    return Json(value);
+}
+Step 3: Modify the Business Layer (AppSettingsService.cs)
+Fetching Dropdown Options
+Modify the service to return a list of options.
+
+csharp
+Copy
+public async Task<List<SelectListItem>> GetDropdownOptionsAsync(string toolName)
+{
+    var options = await _repository.GetDropdownOptionsAsync(toolName);
+    
+    return options.Select(o => new SelectListItem 
+    { 
+        Value = o.Value,  // Use Name as Value
+        Text = o.Value    // Use Name as Text
+    }).ToList();
+}
+Fetching the Selected Value
+csharp
+Copy
+public async Task<string> GetAppSettingValueAsync(string appSettingKey)
+{
+    return await _repository.GetAppSettingValueAsync(appSettingKey);
+}
+Step 4: Modify the Repository (AppSettingsRepository.cs)
+Fetching Dropdown Options
+csharp
+Copy
+public async Task<List<(string Value, string Text)>> GetDropdownOptionsAsync(string toolName)
+{
+    return await (from a in _context.AppSettings
+                  join ta in _context.ToolAppSettings on a.AppSettingId equals ta.AppSettingId
+                  join t in _context.Tools on ta.ToolId equals t.ToolId
+                  where t.Name == toolName
+                  select new { Value = a.Name, Text = a.Name }) // Store & Display Name
+                  .Select(x => (x.Value, x.Text))
+                  .ToListAsync();
+}
+Fetching the Selected Value
+csharp
+Copy
+public async Task<string> GetAppSettingValueAsync(string appSettingKey)
+{
+    return await _context.AppSettings
+        .Where(a => a.Name == appSettingKey)
+        .Select(a => a.Value)
+        .FirstOrDefaultAsync();
+}
+How It Works
+When the page loads, an AJAX call (/Settings/GetAppSettingsOptions) retrieves the dropdown options from the API.
+
+The dropdown is populated dynamically.
+
+When a user selects an option, another AJAX call (/Settings/GetAppSettingValue) fetches the corresponding Value from the database.
+
+The textbox is updated dynamically.
+
